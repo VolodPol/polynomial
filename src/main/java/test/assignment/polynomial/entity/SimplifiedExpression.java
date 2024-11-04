@@ -1,5 +1,6 @@
 package test.assignment.polynomial.entity;
 
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,15 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
+import java.util.List;
 
 @Entity
-//@Table("raw_expression")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RawExpression implements Serializable {
-
+public class SimplifiedExpression {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,9 @@ public class RawExpression implements Serializable {
     @Column(nullable = false)
     private String expression;
 
-    @NotNull
-    @ManyToOne(cascade = CascadeType.ALL)
-    private SimplifiedExpression simplified;
+    @OneToMany(mappedBy = "simplified")
+    private List<RawExpression> parentRawExpressions;
+
+    @OneToMany(mappedBy = "simplified")
+    private List<Evaluation> evaluations;
 }
