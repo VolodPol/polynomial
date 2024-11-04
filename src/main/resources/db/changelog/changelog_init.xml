@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="vova (generated)" id="1730752776709-1">
+        <createTable tableName="evaluation">
+            <column name="result" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variable_value" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="evaluation_pkey"/>
+            </column>
+            <column name="simplified_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="vova (generated)" id="1730752776709-2">
+        <createTable tableName="raw_expression">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="raw_expression_pkey"/>
+            </column>
+            <column name="simplified_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expression" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="vova (generated)" id="1730752776709-3">
+        <createTable tableName="simplified_expression">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="simplified_expression_pkey"/>
+            </column>
+            <column name="expression" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="vova (generated)" id="1730752776709-4">
+        <addForeignKeyConstraint baseColumnNames="simplified_id" baseTableName="evaluation" constraintName="fk2m3s8x128su5red4rwat99hkj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="simplified_expression" validate="true"/>
+    </changeSet>
+    <changeSet author="vova (generated)" id="1730752776709-5">
+        <addForeignKeyConstraint baseColumnNames="simplified_id" baseTableName="raw_expression" constraintName="fkon9hb0819v84jarp59bxqme8q" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="simplified_expression" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
