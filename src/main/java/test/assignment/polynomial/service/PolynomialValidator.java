@@ -13,17 +13,19 @@ import static java.lang.Math.min;
 @Service
 public class PolynomialValidator implements Validator {
 
-
     private static final char PLUS = '+';
     private static final char MINUS = '-';
     private static final char PRODUCT = '*';
+    private final char OPENING_BRACKET = '(';
+    private final char CLOSING_BRACKET = ')';
+    private final char VARIABLE = 'x';
 
     @Override
     public void validateExpressionString(String expression) {
         if (expression.isBlank())
             throw new EmptyExpressionException();
 
-        if (!expression.matches("[\\d-+*^(x)]+"))
+        if (!expression.matches("[\\d-+*^(%s)]+".formatted(VARIABLE)))
             throw new MalformedExpressionException();
 
         checkParenthesesNumber(expression);
@@ -38,9 +40,9 @@ public class PolynomialValidator implements Validator {
         Stack<Character> buffer = new Stack<>();
         try {
             for (char s : expression.toCharArray()) {
-                if (s == '(')
+                if (s == OPENING_BRACKET)
                     buffer.push(s);
-                else if (s == ')')
+                else if (s == CLOSING_BRACKET)
                     buffer.pop();
             }
         } catch (EmptyStackException e) {
@@ -52,7 +54,7 @@ public class PolynomialValidator implements Validator {
 
     private void checkOpeningParenthesis(String expression) {//substitute to method above
         for (int i = 1; i < expression.length(); i++) {
-            if (expression.charAt(i) == '(') {
+            if (expression.charAt(i) == OPENING_BRACKET) {
                 char expectedSign = expression.charAt(i - 1);
                 if (!isSign(expectedSign))
                     throw new MalformedExpressionException();
@@ -62,7 +64,7 @@ public class PolynomialValidator implements Validator {
 
     private void checkClosingParenthesis(String expression) {
         for (int i = 1; i < expression.length() - 1; i++) {
-            if (expression.charAt(i) == ')') {
+            if (expression.charAt(i) == CLOSING_BRACKET) {
                 char expectedSign = expression.charAt(i + 1);
                 boolean hasSign = isSign(expectedSign);
 
@@ -78,13 +80,13 @@ public class PolynomialValidator implements Validator {
 
     private void checkX(String expression) {
         for (int i = 1; i < expression.length() - 1; i++) {
-            if (expression.charAt(i) == 'x') {
+            if (expression.charAt(i) == VARIABLE) {
                 String leftSubstring = expression.substring(0, i);
-                if (expression.charAt(i - 1) != '(' && !leftSubstring.matches(".*\\d+[+\\-*]$"))
+                if (expression.charAt(i - 1) != OPENING_BRACKET && !leftSubstring.matches(".*\\d+[+\\-*]$"))
                     throw new MalformedExpressionException();
 
                 String rightSubstring = expression.substring(i + 1);
-                if (expression.charAt(i + 1) != ')' && !rightSubstring.matches("^[+\\-*]\\d+.*") && !rightSubstring.matches("^\\^\\d+.*"))
+                if (expression.charAt(i + 1) != CLOSING_BRACKET && !rightSubstring.matches("^[+\\-*]\\d+.*") && !rightSubstring.matches("^\\^\\d+.*"))
                     throw new MalformedExpressionException();
 
             }
