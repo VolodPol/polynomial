@@ -2,17 +2,21 @@ package test.assignment.polynomial.service;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-//\d?x(\^\d)?
 
+import static java.lang.Math.min;
+
+
+
+//todo: Utilize Decorator design pattern when the service is ready
 @Service
 public class PolynomialValidator implements Validator {
 
+
+    private static final char PLUS = '+';
+    private static final char MINUS = '-';
+    private static final char PRODUCT = '*';
 
     @Override
     public void validateExpressionString(String expression) {
@@ -22,40 +26,90 @@ public class PolynomialValidator implements Validator {
         if (!expression.matches("[\\d-+*^(x)]+"))
             throw new MalformedExpressionException();
 
-        int num = checkParenthesesNumber(expression);
-        String noParentheses = expression.replaceAll("(\\([-+]?)|(\\))", "");// del all (+ or )
-        boolean suitable = Arrays.stream(noParentheses.split("[-+]"))
-                .allMatch(additive -> additive.matches("(\\d\\*\\d)*x?(\\^\\d)?"));//todo fix first part, ex.: 7*3*x...
+        checkParenthesesNumber(expression);
 
-        if (!suitable) {
-            throw new MalformedExpressionException();
-        }
+        checkOpeningParenthesis(expression);
+        checkClosingParenthesis(expression);
+        checkX(expression);
     }
 
 
-    private int checkParenthesesNumber(String expression) {
-        int numOfGroups = 0;
+    private void checkParenthesesNumber(String expression) {
         Stack<Character> buffer = new Stack<>();
         try {
             for (char s : expression.toCharArray()) {
                 if (s == '(')
                     buffer.push(s);
-                else if (s == ')') {
-                    numOfGroups++;
+                else if (s == ')')
                     buffer.pop();
-                }
             }
         } catch (EmptyStackException e) {
             throw new MalformedExpressionException();
         }
         if (!buffer.isEmpty())
             throw new MalformedExpressionException();
-        return numOfGroups;
+    }
+
+    private void checkOpeningParenthesis(String expression) {//substitute to method above
+        for (int i = 1; i < expression.length(); i++) {
+            if (expression.charAt(i) == '(') {
+                char expectedSign = expression.charAt(i - 1);
+                if (!isSign(expectedSign))
+                    throw new MalformedExpressionException();
+            }
+        }
+    }
+
+    private void checkClosingParenthesis(String expression) {
+        for (int i = 1; i < expression.length() - 1; i++) {
+            if (expression.charAt(i) == ')') {
+                char expectedSign = expression.charAt(i + 1);
+                boolean hasSign = isSign(expectedSign);
+
+                String expectedPower = powerSubstring(i + 1, expression);
+                boolean hasPower = expectedPower.matches("\\^\\d+");
+
+                if (!hasPower && !hasSign)
+                    throw new MalformedExpressionException();
+
+            }
+        }
+    }
+
+    private void checkX(String expression) {
+        for (int i = 0; i < expression.length(); i++) {
+            if (expression.charAt(i) == 'x') {
+                //todo: fix
+
+                // Check previous character condition
+                if (!(i > 0 && (expression.charAt(i - 1) == '(' || Character.isDigit(expression.charAt(i - 1)))))
+                    throw new MalformedExpressionException();
+
+                // Check next character condition
+                if (!(i < expression.length() - 1 && (expression.charAt(i + 1) == ')' || Character.isDigit(expression.charAt(i + 1)))))
+                    throw new MalformedExpressionException();
+
+            }
+        }
+    }
+
+
+    private boolean isSign(char symbol) {
+        return (symbol == PLUS || symbol == MINUS || symbol == PRODUCT);
+    }
+
+    private String powerSubstring(int from, String expression) {
+        int plusIdx = expression.indexOf(PLUS, from);
+        int minusIdx = expression.indexOf(MINUS, from);
+        int productIdx = expression.indexOf(PRODUCT, from);
+
+        int signIdx = min(min(plusIdx, minusIdx), productIdx);
+        return expression.substring(from, signIdx);
     }
 
     @Override
     public void validateVariableValue(String x) {
-        if (x.isBlank())
+        if (x == null || x.isBlank())
             throw new EmptyExpressionException();
 
         try {
