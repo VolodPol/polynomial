@@ -77,16 +77,14 @@ public class PolynomialValidator implements Validator {
     }
 
     private void checkX(String expression) {
-        for (int i = 0; i < expression.length(); i++) {
+        for (int i = 1; i < expression.length() - 1; i++) {
             if (expression.charAt(i) == 'x') {
-                //todo: fix
-
-                // Check previous character condition
-                if (!(i > 0 && (expression.charAt(i - 1) == '(' || Character.isDigit(expression.charAt(i - 1)))))
+                String leftSubstring = expression.substring(0, i);
+                if (expression.charAt(i - 1) != '(' && !leftSubstring.matches(".*\\d+[+\\-*]$"))
                     throw new MalformedExpressionException();
 
-                // Check next character condition
-                if (!(i < expression.length() - 1 && (expression.charAt(i + 1) == ')' || Character.isDigit(expression.charAt(i + 1)))))
+                String rightSubstring = expression.substring(i + 1);
+                if (expression.charAt(i + 1) != ')' && !rightSubstring.matches("^[+\\-*]\\d+.*") && !rightSubstring.matches("^\\^\\d+.*"))
                     throw new MalformedExpressionException();
 
             }
