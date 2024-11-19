@@ -5,14 +5,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.assignment.polynomial.exceptions.EmptyExpressionException;
+import test.assignment.polynomial.exceptions.MalformedExpressionException;
+import test.assignment.polynomial.service.impl.PolynomialValidatorImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = PolynomialValidator.class)
+@ContextConfiguration(classes = PolynomialValidatorImpl.class)
 class PolynomialValidatorTest {
     @Autowired
-    private Validator validator;
+    private PolynomialValidator validator;
 
     @Test
     void emptyInputShouldBeInvalid() {

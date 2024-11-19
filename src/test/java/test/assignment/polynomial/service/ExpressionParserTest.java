@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.assignment.polynomial.service.domain.Expression;
 import test.assignment.polynomial.service.domain.Expression.Polynomial;
 import test.assignment.polynomial.service.domain.Expression.Polynomial.Additive;
+import test.assignment.polynomial.service.impl.ExpressionParserImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ExpressionParser.class})
+@ContextConfiguration(classes = {ExpressionParserImpl.class})
 class ExpressionParserTest {
 
     @Autowired
-    private ExpressionParser parser;
+    private ExpressionParserImpl parser;
 
     @Test
     void parseSimpleExpression() {
@@ -134,6 +135,42 @@ class ExpressionParserTest {
                 secondAdditive,
                 thirdAdditive,
                 fourthAdditive
+        )));
+        assertEquals(expected, parser.toMultiplier(input));
+    }
+
+    @Test
+    void parsePolynomial1() {
+        String input = "3*x^2";
+
+        var firstAdditive = new Additive(3, 2);
+
+        Polynomial expected = new Polynomial(new ArrayList<>(List.of(
+                firstAdditive
+        )));
+        assertEquals(expected, parser.toMultiplier(input));
+    }
+
+    @Test
+    void parsePolynomial2() {
+        String input = "x^2";
+
+        var firstAdditive = new Additive(1, 2);
+
+        Polynomial expected = new Polynomial(new ArrayList<>(List.of(
+                firstAdditive
+        )));
+        assertEquals(expected, parser.toMultiplier(input));
+    }
+
+    @Test
+    void parsePolynomial3() {
+        String input = "2";
+
+        var firstAdditive = new Additive(2, 0);
+
+        Polynomial expected = new Polynomial(new ArrayList<>(List.of(
+                firstAdditive
         )));
         assertEquals(expected, parser.toMultiplier(input));
     }
