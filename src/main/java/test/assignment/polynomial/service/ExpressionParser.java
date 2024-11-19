@@ -40,9 +40,66 @@ public class ExpressionParser implements Parser {
         return expression;
     }
 
-    private Polynomial toMultiplier(String string) {
+    public Polynomial toMultiplier(String string) {
+        List<Polynomial.Additive> additives = new ArrayList<>();
 
-        return null;
+        int index = 0;
+        boolean isMinus = false;
+        String[] symbols = string.split("");
+
+        while(index < symbols.length) {
+            int coefficient = 1, power = 1;
+            if (symbols[index].equals("-")) {
+                isMinus = true;
+                index++;
+            } else if (symbols[index].equals("+")){
+                isMinus = false;
+                index++;
+            }
+
+            if (isNumber(symbols, index)) {
+                coefficient = Integer.parseInt(symbols[index++]);
+
+                if (symbols[index].equals("*")) {
+                    index++;
+
+                    if (symbols[index].equals("x")) {
+                        index++;
+
+                        if (symbols[index].equals("^")) {
+                            index++;//todo: fix IndexOutOfRangeException
+                            if (isNumber(symbols, index)) {
+                                power = Integer.parseInt(symbols[index++]);
+                            }
+                        }
+                    }
+
+
+                } else {
+                    power = 0;
+                }
+
+            } else if (symbols[index].equals("x")){
+                index++;
+
+                if (symbols[index].equals("^")) {
+                    index++;
+                    if (isNumber(symbols, index)) {
+                        power = Integer.parseInt(symbols[index++]);
+                    }
+                }
+            }
+
+            if(isMinus)
+                coefficient *= -1;
+            additives.add(new Polynomial.Additive(coefficient, power));
+
+        }
+        return new Polynomial(additives);
+    }
+
+    private boolean isNumber(String[] symbols, int index) {
+        return symbols[index].matches("\\d+");
     }
 
 
