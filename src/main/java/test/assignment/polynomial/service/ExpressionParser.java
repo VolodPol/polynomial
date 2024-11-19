@@ -61,36 +61,15 @@ public class ExpressionParser implements Parser {
                 coefficient = Integer.parseInt(symbols[index++]);
 
                 if (symbols[index].equals("*")) {
-                    index++;
-
-                    if (symbols[index].equals("x")) {
-                        index++;
-
-                        if (symbols[index].equals("^")) {
-                            index++;//todo: fix IndexOutOfRangeException
-                            if (isNumber(symbols, index)) {
-                                power = Integer.parseInt(symbols[index++]);
-                            }
-                        }
-                    }
-
-
-                } else {
-                    power = 0;
-                }
-
-            } else if (symbols[index].equals("x")){
-                index++;
-
-                if (symbols[index].equals("^")) {
-                    index++;
-                    if (isNumber(symbols, index)) {
+                    if (symbols[++index].equals("x") && symbols[++index].equals("^") && isNumber(symbols, ++index))
                         power = Integer.parseInt(symbols[index++]);
-                    }
-                }
-            }
+                } else
+                    power = 0;
 
-            if(isMinus)
+            } else if (symbols[index].equals("x") && symbols[++index].equals("^") && isNumber(symbols, ++index))
+                power = Integer.parseInt(symbols[index++]);
+
+            if (isMinus)
                 coefficient *= -1;
             additives.add(new Polynomial.Additive(coefficient, power));
 
