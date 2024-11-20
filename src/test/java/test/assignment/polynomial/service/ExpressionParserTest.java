@@ -47,7 +47,7 @@ class ExpressionParserTest {
                         firstAdditive,
                         secondAdditive
                 ))))));
-        assertEquals(expected, parser.exressionToString(input));
+        assertEquals(expected, parser.expressionToString(input));
     }
 
     @Test
@@ -98,7 +98,7 @@ class ExpressionParserTest {
                         fifthAdditive
                 )))
         )));
-        assertEquals(expected, parser.exressionToString(input));
+        assertEquals(expected, parser.expressionToString(input));
     }
 
 

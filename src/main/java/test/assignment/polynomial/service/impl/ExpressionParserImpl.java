@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -22,18 +23,15 @@ public class ExpressionParserImpl implements ExpressionParser {
                 .toList();
 
         List<Polynomial> multipliers = new ArrayList<>();
-
-        if (polynomialStrings.size() > 1) {
+        if (polynomialStrings.size() > 1)
             polynomialStrings.forEach(string -> multipliers.add(this.toMultiplier(string)));
-        } else {
-            //case with:     (...)^n
+        else {
             Matcher powerExtractor = Pattern.compile("\\([^()]+\\)\\^(?<pow>\\d+)")
                     .matcher(polynomialStrings.getFirst());
             int number = powerExtractor.matches() ? Integer.parseInt(powerExtractor.group("pow")) : 1;
 
-            for (int i = 0; i < number; i++) {
+            for (int i = 0; i < number; i++)
                 multipliers.add(this.toMultiplier(polynomialStrings.getFirst()));
-            }
         }
 
         multipliers.forEach(expression::addMultiplier);
@@ -48,7 +46,7 @@ public class ExpressionParserImpl implements ExpressionParser {
         int index = 0;
         while(index < symbols.length) {
             int coefficient = 1, power = 1;
-            if (symbols[index].equals("-")) {//todo: refactor(move after exception handling)
+            if (symbols[index].equals("-")) {
                 isMinus = true;
                 index++;
             } else if (symbols[index].equals("+")){
@@ -89,7 +87,42 @@ public class ExpressionParserImpl implements ExpressionParser {
     }
 
     @Override
-    public String exressionToString(Expression expression) {
-        return "";
+    public String expressionToString(Expression expression) {
+        List<String> multipliers = expression.getMultipliers().stream()
+                .map(multiplier -> "(%s)".formatted(
+                        multiplier.getAdditives().stream()
+                                .map(this::mapAdditive)
+                                .collect(Collectors.joining("+"))
+                                .replaceAll("[+]-", "-")
+                ))
+                .toList();
+
+        String result = String.join("*", multipliers);
+        return multipliers.size() > 1
+                ? result
+                : result.substring(1, result.length() - 1);
+    }
+
+    private String mapAdditive(Polynomial.Additive additive) {
+        StringBuilder element = new StringBuilder();
+
+        final int coefficient = additive.getCoefficient();
+        final int power = additive.getExponent();
+        if (coefficient < -1 || (coefficient == 1 && power == 0))
+            element.append(coefficient);
+        else if (coefficient == -1)
+            element.append("-");
+        else if (coefficient > 1) {
+            element.append(coefficient);
+            if (power >= 1)
+                element.append("*");
+        }
+
+        if (power > 1)
+            element.append("x").append("^%d".formatted(power));
+        else if (power == 1)
+            element.append("x");
+
+        return element.toString();
     }
 }

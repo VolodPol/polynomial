@@ -5,5 +5,5 @@ import test.assignment.polynomial.service.domain.Expression;
 public interface ExpressionParser {
     Expression parseExpression(String representation);
 
-    String exressionToString(Expression expression);
+    String expressionToString(Expression expression);
 }
