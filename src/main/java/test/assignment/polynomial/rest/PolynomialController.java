@@ -15,6 +15,6 @@ public class PolynomialController {
 
     @GetMapping("/students")
     public List<RawExpression> findAll() {
-        return repository.findAll();
+        return null;
     }
 }
