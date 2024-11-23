@@ -1,6 +1,6 @@
 package test.assignment.polynomial.service.impl;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import test.assignment.polynomial.service.ExpressionParser;
 import test.assignment.polynomial.service.domain.Expression;
 import test.assignment.polynomial.service.domain.Expression.Polynomial;
@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-@Service
+@Component
 public class ExpressionParserImpl implements ExpressionParser {
     @Override
     public Expression parseExpression(String representation) {

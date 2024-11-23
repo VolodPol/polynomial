@@ -1,6 +1,6 @@
 package test.assignment.polynomial.service.impl;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import test.assignment.polynomial.exceptions.EmptyExpressionException;
 import test.assignment.polynomial.exceptions.MalformedExpressionException;
 import test.assignment.polynomial.exceptions.NotDecimalVariableValueException;
@@ -14,15 +14,15 @@ import static java.lang.Math.min;
 
 
 //todo: Utilize Decorator design pattern when the service is ready
-@Service
+@Component
 public class PolynomialValidatorImpl implements PolynomialValidator {
 
     private static final char PLUS = '+';
     private static final char MINUS = '-';
     private static final char PRODUCT = '*';
-    private final char OPENING_BRACKET = '(';
-    private final char CLOSING_BRACKET = ')';
-    private final char VARIABLE = 'x';
+    private static final char OPENING_BRACKET = '(';
+    private static final char CLOSING_BRACKET = ')';
+    private static final char VARIABLE = 'x';
 
     @Override
     public void validateExpressionString(String expression) {
