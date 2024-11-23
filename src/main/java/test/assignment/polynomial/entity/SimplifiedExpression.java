@@ -3,10 +3,7 @@ package test.assignment.polynomial.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SimplifiedExpression {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +27,14 @@ public class SimplifiedExpression {
 
     @OneToMany(mappedBy = "simplified")
     private List<Evaluation> evaluations;
+
+    public void addRawExpression(RawExpression rawExpression) {
+        this.parentRawExpressions.add(rawExpression);
+        rawExpression.setSimplified(this);
+    }
+
+    public void addEvaluation(Evaluation evaluation) {
+        this.evaluations.add(evaluation);
+        evaluation.setSimplified(this);
+    }
 }
