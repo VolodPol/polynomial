@@ -106,7 +106,6 @@ public class ExpressionParserImpl implements ExpressionParser {
 
     private String mapAdditive(Polynomial.Additive additive) {
         StringBuilder element = new StringBuilder();
-
         final int c = additive.getCoefficient();
         final int power = additive.getExponent();
         boolean nonZeroPower = power != 0;
@@ -117,14 +116,14 @@ public class ExpressionParserImpl implements ExpressionParser {
                 element.append("^%d".formatted(power));
         }
 
-        if (c != 1 && c != -1 && nonZeroPower)
-            element.insert(0, "%d*".formatted(c));
         if (!nonZeroPower)
             element.insert(0, c);
         else if (c == 1)
             element.insert(0, "+");
         else if (c == -1)
             element.insert(0, "-");
+        else
+            element.insert(0, "%d*".formatted(c));
         return element.toString();
     }
 }
