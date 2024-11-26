@@ -94,6 +94,7 @@ public class ExpressionParserImpl implements ExpressionParser {
                                 .map(this::mapAdditive)
                                 .collect(Collectors.joining("+"))
                                 .replaceAll("[+]-", "-")
+                                .replaceAll("[+][+]", "+")
                 ))
                 .toList();
 
@@ -116,16 +117,14 @@ public class ExpressionParserImpl implements ExpressionParser {
                 element.append("^%d".formatted(power));
         }
 
-        if (c != 1 && c != -1) {
-            if (nonZeroPower)
-                element.insert(0, "%d*".formatted(c));
-            else
-                element.insert(0, c);
-        }
-        else if (!nonZeroPower)
+        if (c != 1 && c != -1 && nonZeroPower)
+            element.insert(0, "%d*".formatted(c));
+        if (!nonZeroPower)
             element.insert(0, c);
-        else
-            element.insert(0, c == 1 ? "+" : "-");
+        else if (c == 1)
+            element.insert(0, "+");
+        else if (c == -1)
+            element.insert(0, "-");
         return element.toString();
     }
 }

@@ -102,7 +102,7 @@ class ExpressionParserTest {
     }
 
     @Test
-    void parse() {
+    void simplifiedToString() {
         String expected = "7-5*x+19*x^2+6*x^3";
 
         var firstAdditive = new Additive(7, 0);
@@ -116,6 +116,40 @@ class ExpressionParserTest {
                         secondAdditive,
                         thirdAdditive,
                         fourthAdditive
+                )))
+        )));
+        assertEquals(expected, parser.expressionToString(input));
+    }
+
+    @Test
+    void differentCasesToString() {
+        String expected = "2+4-3+1-1+x-x+2*x-2*x+3*x^2-3*x^2";
+
+        var firstAdditive = new Additive(2, 0);
+        var secondAdditive = new Additive(4, 0);
+        var thirdAdditive = new Additive(-3, 0);
+        var fourthAdditive = new Additive(1, 0);
+        var fifthAdditive = new Additive(-1, 0);
+        var sixthAdditive = new Additive(1, 1);
+        var seventhAdditive = new Additive(-1, 1);
+        var eighthAdditive = new Additive(2, 1);
+        var ninethAdditive = new Additive(-2, 1);
+        var tenthAdditive = new Additive(3, 2);
+        var eleventhAdditive = new Additive(-3, 2);
+
+        Expression input = new Expression(new ArrayList<>(List.of(
+                new Polynomial(new ArrayList<>(List.of(
+                        firstAdditive,
+                        secondAdditive,
+                        thirdAdditive,
+                        fourthAdditive,
+                        fifthAdditive,
+                        sixthAdditive,
+                        seventhAdditive,
+                        eighthAdditive,
+                        ninethAdditive,
+                        tenthAdditive,
+                        eleventhAdditive
                 )))
         )));
         assertEquals(expected, parser.expressionToString(input));
