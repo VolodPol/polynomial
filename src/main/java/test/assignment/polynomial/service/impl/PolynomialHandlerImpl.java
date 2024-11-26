@@ -12,17 +12,10 @@ import test.assignment.polynomial.repository.EvaluationRepository;
 import test.assignment.polynomial.repository.RawExpressionRepository;
 import test.assignment.polynomial.repository.SimplifiedExpressionRepository;
 import test.assignment.polynomial.service.ExpressionParser;
+import test.assignment.polynomial.service.ExpressionSimplifier;
 import test.assignment.polynomial.service.PolynomialHandler;
 import test.assignment.polynomial.service.PolynomialValidator;
 import test.assignment.polynomial.service.domain.Expression;
-import test.assignment.polynomial.service.domain.Expression.Polynomial;
-import test.assignment.polynomial.service.domain.Expression.Polynomial.Additive;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
 
 
 @Service
@@ -30,6 +23,8 @@ import static java.util.stream.Collectors.reducing;
 public class PolynomialHandlerImpl implements PolynomialHandler {
     private final PolynomialValidator validator;
     private final ExpressionParser parser;
+    private final ExpressionSimplifier simplifier;
+
     private final SimplifiedExpressionRepository simplifiedRepository;
     private final RawExpressionRepository rawRepository;
     private final EvaluationRepository evaluationRepository;
@@ -44,7 +39,7 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
             return simplifiedExpression;
 
         Expression expression = parser.parseExpression(raw);
-        simplifyExpression(expression);
+        simplifier.simplifyExpression(expression);
         String simplified = parser.expressionToString(expression);
 
         RawExpression rawEntity = RawExpression.builder().expression(raw).build();
@@ -82,59 +77,6 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
 
         simplifiedExpression.addEvaluation(newEvaluation);
         return result;
-    }
-
-    private void simplifyExpression(Expression expression) {
-        simplifyMultipliers(expression);
-        applyProduct(expression);
-        simplifyMultipliers(expression);
-    }
-
-    private void simplifyMultipliers(Expression expression) {
-        expression.getMultipliers()
-                .forEach(polynomial -> {
-                    Map<Integer, Optional<Additive>> map = polynomial.getAdditives().stream()
-                            .collect(groupingBy(
-                                    Additive::getExponent,
-                                    reducing((a, b) -> new Additive(
-                                            a.getCoefficient() + b.getCoefficient(),
-                                            a.getExponent()
-                                    )))
-                            );
-                    List<Additive> simplified = map.values().stream()
-                            .<Additive>mapMulti(Optional::ifPresent)
-                            .collect(Collectors.toList());
-                    polynomial.setAdditives(simplified);
-                });
-    }
-
-    private void applyProduct(Expression expression) {
-        Polynomial one = new Polynomial();
-        one.addAdditive(new Additive(1, 0));
-        expression.setMultipliers(
-                new ArrayList<>(List.of(
-                        expression.getMultipliers().stream()
-                                .reduce(one, (p1, p2) -> {
-                                    List<Additive> p1Additives = p1.getAdditives();
-                                    List<Additive> p2Additives = p2.getAdditives();
-
-                                    List<Additive> simplifiedAdditives = new ArrayList<>();
-                                    for (Additive p1Additive : p1Additives) {
-                                        for (Additive p2Additive : p2Additives) {
-                                            simplifiedAdditives.add(
-                                                    new Additive(
-                                                            p1Additive.getCoefficient() * p2Additive.getCoefficient(),
-                                                            p1Additive.getExponent() + p2Additive.getExponent()
-                                                    )
-                                            );
-                                        }
-                                    }
-
-                                    return new Polynomial(simplifiedAdditives);
-                                })
-                        )
-                )
-        );
     }
 
     //restriction: only 1 multiplier
