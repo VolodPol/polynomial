@@ -1,6 +1,8 @@
 package test.assignment.polynomial.service;
 
+import test.assignment.polynomial.entity.SimplifiedExpression;
+
 public interface PolynomialHandler {
-    String simplify(String raw);
+    SimplifiedExpression simplify(String raw);
     double evaluate(String simplified, double value);
 }

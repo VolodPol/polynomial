@@ -7,6 +7,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode
 public class Expression {
     private List<Polynomial> multipliers;
@@ -21,6 +22,7 @@ public class Expression {
 
     @AllArgsConstructor
     @Getter
+    @Setter
     @EqualsAndHashCode
     public static class Polynomial {
         private List<Additive> additives;

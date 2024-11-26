@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,7 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SimplifiedExpression {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class SimplifiedExpression {
     private String expression;
 
     @OneToMany(mappedBy = "simplified")
-    private List<RawExpression> parentRawExpressions;
+    private List<RawExpression> parentRawExpressions = new ArrayList<>();
 
     @OneToMany(mappedBy = "simplified")
-    private List<Evaluation> evaluations;
+    private List<Evaluation> evaluations = new ArrayList<>();
 
     public void addRawExpression(RawExpression rawExpression) {
         this.parentRawExpressions.add(rawExpression);

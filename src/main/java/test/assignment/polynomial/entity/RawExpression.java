@@ -7,7 +7,6 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-//@Table("raw_expression")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +21,6 @@ public class RawExpression implements Serializable {
     @Column(nullable = false)
     private String expression;
 
-    @NotNull
     @ManyToOne(cascade = CascadeType.ALL)
     private SimplifiedExpression simplified;
 }

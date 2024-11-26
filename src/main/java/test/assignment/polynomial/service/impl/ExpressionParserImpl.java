@@ -108,20 +108,31 @@ public class ExpressionParserImpl implements ExpressionParser {
 
         final int coefficient = additive.getCoefficient();
         final int power = additive.getExponent();
-        if (coefficient < -1 || (coefficient == 1 && power == 0))
-            element.append(coefficient);
-        else if (coefficient == -1)
-            element.append("-");
-        else if (coefficient > 1) {
-            element.append(coefficient);
-            if (power >= 1)
-                element.append("*");
+
+        if (power != 0) {
+            element.append("x");
+            if (power != 1) {
+                element.append("^%d".formatted(power));
+            }
         }
 
-        if (power > 1)
-            element.append("x").append("^%d".formatted(power));
-        else if (power == 1)
-            element.append("x");
+        if (coefficient != 1 && coefficient != -1) {
+            if (power != 0) {
+                element.insert(0, "%d*".formatted(coefficient));
+            } else {
+                element.insert(0, coefficient);
+            }
+        } else {
+            if (power == 0) {
+                element.insert(0, coefficient);
+            } else {
+                if (coefficient == 1) {
+                    element.insert(0, "+");
+                } else {
+                    element.insert(0, "-");
+                }
+            }
+        }
 
         return element.toString();
     }
