@@ -1,6 +1,7 @@
 package test.assignment.polynomial.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     private final EvaluationRepository evaluationRepository;
 
     @Override
+    @Cacheable("simplified")
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public SimplifiedExpression simplify(String raw) {
         validator.validateExpressionString(raw);
@@ -53,6 +55,7 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     }
 
     @Override
+    @Cacheable("evaluated")
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public double evaluate(String simplified, double value) {
         validator.validateExpressionString(simplified);
