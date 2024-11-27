@@ -41,36 +41,57 @@ public class ExpressionParserImpl implements ExpressionParser {
     public Polynomial toMultiplier(String string) {
         List<Polynomial.Additive> additives = new ArrayList<>();
         boolean isMinus = false;
-        String[] symbols = string.split("");
+        String[] units = divide(string);
 
         int index = 0;
-        while(index < symbols.length) {
+        while(index < units.length) {
             int coefficient = 1, power = 1;
-            if (symbols[index].equals("-")) {
+            if (units[index].equals("-")) {
                 isMinus = true;
                 index++;
-            } else if (symbols[index].equals("+")){
+            } else if (units[index].equals("+")){
                 isMinus = false;
                 index++;
             }
 
             try {
-                if (isNumber(symbols, index)) {
-                    coefficient = Integer.parseInt(symbols[index++]);
+                if (isNumber(units, index)) {
+                    coefficient = Integer.parseInt(units[index++]);
 
-                    if (index == symbols.length || !symbols[index].equals("*"))
+                    if (index == units.length || !units[index].equals("*"))
                         power = 0;
                     else
                         index++;
                 }
-                if (symbols[index].equals("x") && symbols[++index].equals("^") && isNumber(symbols, ++index))
-                    power = Integer.parseInt(symbols[index++]);
+                if (units[index].equals("x") && units[++index].equals("^") && isNumber(units, ++index))
+                    power = Integer.parseInt(units[index++]);
             } catch (ArrayIndexOutOfBoundsException _){}
 
             if (isMinus) coefficient *= -1;
             additives.add(new Polynomial.Additive(coefficient, power));
         }
         return new Polynomial(additives);
+    }
+
+    private String[] divide(String string) {
+        List<String> split = new ArrayList<>(List.of(string.split("")));
+        int idx = 0;
+
+        while (idx < split.size() - 1) {
+            int first = idx;
+            if (Character.isDigit(split.get(idx).charAt(0)))
+                while (idx < split.size() - 1 && Character.isDigit(split.get(idx + 1).charAt(0)))
+                    idx++;
+
+            if (first != idx) {
+                StringBuilder n = new StringBuilder();
+                split.subList(first, idx + 1).forEach(n::append);
+                split.set(first, n.toString());
+                split.subList(first + 1, idx + 1).clear();
+            }
+            idx++;
+        }
+        return split.toArray(new String[0]);
     }
 
     private boolean isNumber(String[] symbols, int index) {

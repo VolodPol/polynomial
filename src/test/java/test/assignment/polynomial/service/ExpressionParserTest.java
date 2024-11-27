@@ -174,7 +174,7 @@ class ExpressionParserTest {
     }
 
     @Test
-    void parsePolynomialAllCasesInOne() {
+    void parsePolynomialDifferentCases() {
         String input = "3*x^2-5*x+3-x^3";
 
         var firstAdditive = new Additive(3, 2);
@@ -227,6 +227,28 @@ class ExpressionParserTest {
                 firstAdditive
         )));
         assertEquals(expected, parser.toMultiplier(input));
+    }
+
+    @Test
+    void parsePolynomialAllCasesInOne() {
+        String input = "7-5*x+1945*x^2+6*x^32";
+
+        var firstAdditive = new Additive(7, 0);
+        var secondAdditive = new Additive(-5, 1);
+
+        var thirdAdditive = new Additive(1945, 2);
+        var fourthAdditive = new Additive(6, 32);
+
+
+        Expression expected = new Expression(List.of(
+                new Polynomial(new ArrayList<>(List.of(
+                        firstAdditive,
+                        secondAdditive,
+                        thirdAdditive,
+                        fourthAdditive
+                )))
+        ));
+        assertEquals(expected, parser.parseExpression(input));
     }
 
 }
