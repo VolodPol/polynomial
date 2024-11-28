@@ -27,10 +27,10 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
     @Override
     public void validateExpressionString(String expression) {
         if (expression.isBlank())
-            throw new EmptyExpressionException();
+            throw new EmptyExpressionException("The expression must not be empty!");
 
         if (!expression.matches("[\\d-+*^(%s)]+".formatted(VARIABLE)))
-            throw new MalformedExpressionException();
+            throw new MalformedExpressionException("The expression contains forbidden characters!");
 
         checkParenthesesNumber(expression);
 
@@ -50,10 +50,10 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
                     buffer.pop();
             }
         } catch (EmptyStackException e) {
-            throw new MalformedExpressionException();
+            throw new MalformedExpressionException("Each opening bracket must have a closing one!");
         }
         if (!buffer.isEmpty())
-            throw new MalformedExpressionException();
+            throw new MalformedExpressionException("Each opening bracket must have a closing one!");
     }
 
     private void checkOpeningParenthesis(String expression) {//substitute to method above
@@ -76,7 +76,7 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
                 boolean hasPower = expectedPower.matches("\\^\\d+");
 
                 if (!hasPower && !hasSign)
-                    throw new MalformedExpressionException();
+                    throw new MalformedExpressionException("Malformed expression!");
 
             }
         }
@@ -87,11 +87,11 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
             if (expression.charAt(i) == VARIABLE) {
                 String leftSubstring = expression.substring(0, i);
                 if (expression.charAt(i - 1) != OPENING_BRACKET && !leftSubstring.matches(".*\\d+[+\\-*]$"))
-                    throw new MalformedExpressionException();
+                    throw new MalformedExpressionException("Malformed characters before 'x' variable");
 
                 String rightSubstring = expression.substring(i + 1);
                 if (expression.charAt(i + 1) != CLOSING_BRACKET && !rightSubstring.matches("^[+\\-*]\\d+.*") && !rightSubstring.matches("^\\^\\d+.*"))
-                    throw new MalformedExpressionException();
+                    throw new MalformedExpressionException("Malformed characters after 'x' variable");
 
             }
         }
@@ -114,12 +114,12 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
     @Override
     public void validateVariableValue(String x) {
         if (x == null || x.isBlank())
-            throw new EmptyExpressionException();
+            throw new EmptyExpressionException("Empty variable");
 
         try {
             Double.parseDouble(x);
         } catch (NumberFormatException e){
-            throw new NotDecimalVariableValueException();
+            throw new NotDecimalVariableValueException("The value must be a decimal number!");
         }
     }
 }
