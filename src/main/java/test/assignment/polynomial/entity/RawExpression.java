@@ -7,6 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
+@Table(name = "raw_expression")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
