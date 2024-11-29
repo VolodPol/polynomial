@@ -112,12 +112,12 @@ public class PolynomialValidatorImpl implements PolynomialValidator {
     }
 
     @Override
-    public void validateVariableValue(String x) {
+    public double validateVariableValue(String x) {
         if (x == null || x.isBlank())
             throw new EmptyExpressionException("Empty variable");
 
         try {
-            Double.parseDouble(x);
+            return Double.parseDouble(x);
         } catch (NumberFormatException e){
             throw new NotDecimalVariableValueException("The value must be a decimal number!");
         }

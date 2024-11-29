@@ -57,8 +57,9 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     @Override
     @Cacheable("evaluated")
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public double evaluate(String simplified, double value) {
+    public double evaluate(String simplified, String value) {
         validator.validateExpressionString(simplified);
+        double doubleValue = validator.validateVariableValue(value);
 
         SimplifiedExpression simplifiedExpression = simplifiedRepository.findSimplifiedExpressionByExpression(simplified);
         if (simplifiedExpression == null){
@@ -71,7 +72,7 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
         }
 
         Expression expression = parser.parseExpression(simplified);
-        double result = evaluateExpression(expression, value);
+        double result = evaluateExpression(expression, doubleValue);
         Evaluation newEvaluation = Evaluation.builder()
                 .result(result)
                 .build();

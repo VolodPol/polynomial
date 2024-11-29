@@ -30,7 +30,7 @@ public class PolynomialController {
 
     @PostMapping(value = "evaluate", consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<Double> evaluateSimplifiedExpression(@RequestBody String simplified,
-                                                               @RequestParam("value") double value) {
+                                                               @RequestParam("value") String value) {
         double evaluated = handler.evaluate(simplified, value);
         return ResponseEntity.ok(evaluated);
     }

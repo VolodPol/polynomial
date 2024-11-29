@@ -4,5 +4,5 @@ import test.assignment.polynomial.entity.SimplifiedExpression;
 
 public interface PolynomialHandler {
     SimplifiedExpression simplify(String raw);
-    double evaluate(String simplified, double value);
+    double evaluate(String simplified, String value);
 }
