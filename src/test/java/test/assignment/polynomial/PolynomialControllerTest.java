@@ -5,13 +5,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.assertj.core.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,13 +26,13 @@ import test.assignment.polynomial.repository.RawExpressionRepository;
 import test.assignment.polynomial.repository.SimplifiedExpressionRepository;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class PolynomialControllerTest {
-//TODO: Database clean-up after each test method execution
     @Autowired
     private MockMvc rest;
 
@@ -46,7 +46,7 @@ class PolynomialControllerTest {
     private EvaluationRepository evaluationRepo;
 
     @Autowired
-    private EntityManager manager;
+    private CacheManager manager;
 
     private static final String RAW = "(2*x+7)*(3*x^2-x+1)";
 
@@ -58,8 +58,7 @@ class PolynomialControllerTest {
 
     @BeforeEach
     void setUp() {
-        manager.clear();
-        manager.flush();
+        manager.getCacheNames().forEach(s -> Objects.requireNonNull(manager.getCache(s)).clear());
     }
 
     @Test
