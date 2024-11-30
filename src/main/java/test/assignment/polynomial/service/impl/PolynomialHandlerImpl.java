@@ -22,7 +22,7 @@ import test.assignment.polynomial.service.domain.Expression;
 @Service
 @AllArgsConstructor
 public class PolynomialHandlerImpl implements PolynomialHandler {
-    private final PolynomialValidator validator;
+    private final PolynomialValidator polynomialValidator;
     private final ExpressionParser parser;
     private final ExpressionSimplifier simplifier;
 
@@ -34,7 +34,7 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     @Cacheable("simplified")
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public SimplifiedExpression simplify(String raw) {
-        validator.validateExpressionString(raw);
+        polynomialValidator.validateExpressionString(raw);
 
         SimplifiedExpression simplifiedExpression = simplifiedRepository.findByRawExpression(raw);
         if (simplifiedExpression != null)
@@ -58,8 +58,8 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     @Cacheable("evaluated")
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public double evaluate(String simplified, String value) {
-        validator.validateExpressionString(simplified);
-        double doubleValue = validator.validateVariableValue(value);
+        polynomialValidator.validateExpressionString(simplified);
+        double doubleValue = polynomialValidator.validateVariableValue(value);
 
         SimplifiedExpression simplifiedExpression = simplifiedRepository.findSimplifiedExpressionByExpression(simplified);
         if (simplifiedExpression == null){
