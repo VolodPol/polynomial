@@ -15,7 +15,7 @@ import test.assignment.polynomial.repository.SimplifiedExpressionRepository;
 import test.assignment.polynomial.service.ExpressionParser;
 import test.assignment.polynomial.service.ExpressionSimplifier;
 import test.assignment.polynomial.service.PolynomialHandler;
-import test.assignment.polynomial.service.PolynomialValidator;
+import test.assignment.polynomial.service.validator.PolynomialValidator;
 import test.assignment.polynomial.service.domain.Expression;
 
 

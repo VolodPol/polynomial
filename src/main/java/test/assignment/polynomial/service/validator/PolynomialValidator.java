@@ -1,4 +1,4 @@
-package test.assignment.polynomial.service;
+package test.assignment.polynomial.service.validator;
 
 
 public interface PolynomialValidator {

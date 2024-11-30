@@ -1,4 +1,4 @@
-package test.assignment.polynomial;
+package test.assignment.polynomial.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
