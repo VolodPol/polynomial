@@ -6,8 +6,9 @@ import test.assignment.polynomial.service.validator.PolynomialValidator;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static java.lang.Math.min;
 
 public class ParenthesisValidator extends BaseValidator {
 
@@ -65,12 +66,11 @@ public class ParenthesisValidator extends BaseValidator {
                 char expectedSign = expression.charAt(i + 1);
                 boolean hasSign = isSign(expectedSign);
 
-                String expectedPower = powerSubstring(i + 1, expression);
-                boolean hasPower = expectedPower.matches("\\^\\d+");
-
-                if (!hasPower && !hasSign)
-                    throw new MalformedExpressionException("Malformed expression!");
-
+                if (!hasSign) {
+                    int powerIdx = powerSubstring(i + 1, expression);
+                    if (powerIdx == i + 1)
+                        throw new MalformedExpressionException("Malformed expression!");
+                }
             }
         }
     }
@@ -94,12 +94,11 @@ public class ParenthesisValidator extends BaseValidator {
         return (symbol == PLUS || symbol == MINUS || symbol == PRODUCT);
     }
 
-    private String powerSubstring(int from, String expression) {
-        int plusIdx = expression.indexOf(PLUS, from);
-        int minusIdx = expression.indexOf(MINUS, from);
-        int productIdx = expression.indexOf(PRODUCT, from);
+    private int powerSubstring(int from, String expression) {
+        Matcher match = Pattern.compile("(?<power>\\^\\d+)").matcher(expression.substring(from));
+        if (match.matches())
+            return from + match.group("power").length();
 
-        int signIdx = min(min(plusIdx, minusIdx), productIdx);
-        return expression.substring(from, signIdx);
+        return from;
     }
 }

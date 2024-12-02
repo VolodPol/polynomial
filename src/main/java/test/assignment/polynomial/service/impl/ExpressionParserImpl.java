@@ -18,20 +18,27 @@ public class ExpressionParserImpl implements ExpressionParser {
     @Override
     public Expression parseExpression(String representation) {
         Expression expression = new Expression();
-        List<String> polynomialStrings = Arrays.stream(representation.split("[)]\\*[(]"))
-                .map(this::removeBrackets)
+        String[] split = representation.split("[)]\\*[(]");
+        List<String> polynomialStrings = split.length == 1 ?
+                Arrays.stream(split).toList()
+                : Arrays.stream(split).map(this::removeBrackets)
                 .toList();
 
         List<Polynomial> multipliers = new ArrayList<>();
         if (polynomialStrings.size() > 1)
             polynomialStrings.forEach(string -> multipliers.add(this.toMultiplier(string)));
         else {
+            String element = polynomialStrings.getFirst();
             Matcher powerExtractor = Pattern.compile("\\([^()]+\\)\\^(?<pow>\\d+)")
-                    .matcher(polynomialStrings.getFirst());
-            int number = powerExtractor.matches() ? Integer.parseInt(powerExtractor.group("pow")) : 1;
+                    .matcher(element);
+            int number = 1;
+            if (powerExtractor.matches()) {
+                number = Integer.parseInt(powerExtractor.group("pow"));
+                element = element.substring(1, element.length() - 3);
+            }
 
             for (int i = 0; i < number; i++)
-                multipliers.add(this.toMultiplier(polynomialStrings.getFirst()));
+                multipliers.add(this.toMultiplier(element));
         }
 
         multipliers.forEach(expression::addMultiplier);
