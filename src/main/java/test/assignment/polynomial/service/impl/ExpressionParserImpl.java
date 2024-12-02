@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import test.assignment.polynomial.service.ExpressionParser;
 import test.assignment.polynomial.service.domain.Expression;
 import test.assignment.polynomial.service.domain.Expression.Polynomial;
+import test.assignment.polynomial.service.domain.Expression.Polynomial.Additive;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +47,7 @@ public class ExpressionParserImpl implements ExpressionParser {
     }
 
     public Polynomial toMultiplier(String string) {
-        List<Polynomial.Additive> additives = new ArrayList<>();
+        List<Additive> additives = new ArrayList<>();
         boolean isMinus = false;
         String[] units = divide(string);
 
@@ -75,7 +76,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             } catch (ArrayIndexOutOfBoundsException _){}
 
             if (isMinus) coefficient *= -1;
-            additives.add(new Polynomial.Additive(coefficient, power));
+            additives.add(new Additive(coefficient, power));
         }
         return new Polynomial(additives);
     }
@@ -117,13 +118,26 @@ public class ExpressionParserImpl implements ExpressionParser {
     @Override
     public String expressionToString(Expression expression) {
         List<String> multipliers = expression.getMultipliers().stream()
-                .map(multiplier -> "(%s)".formatted(
-                        multiplier.getAdditives().stream()
-                                .map(this::mapAdditive)
-                                .collect(Collectors.joining("+"))
-                                .replaceAll("[+]-", "-")
-                                .replaceAll("[+][+]", "+")
-                ))
+                .map(multiplier -> {
+                    List<Additive> sorted = multiplier.getAdditives().stream()
+                            .sorted((o1, o2) -> Integer.compare(o2.getExponent(), o1.getExponent()))
+                            .toList();
+                    String first = sorted.isEmpty() ? "" : this.mapAdditive(sorted.getFirst());
+                    return "(%s)".formatted(
+                            first.concat(
+                                    sorted.stream()
+                                            .skip(1)
+                                            .map(additive -> {
+                                                String text = this.mapAdditive(additive);
+                                                if (!text.startsWith("+") && !text.startsWith("-"))
+                                                    return "+".concat(text);
+
+                                                return text;
+                                            })
+                                            .collect(Collectors.joining())
+                            )
+                    );
+                })
                 .toList();
 
         String result = String.join("*", multipliers);
@@ -132,7 +146,7 @@ public class ExpressionParserImpl implements ExpressionParser {
                 : result.substring(1, result.length() - 1);
     }
 
-    private String mapAdditive(Polynomial.Additive additive) {
+    private String mapAdditive(Additive additive) {
         StringBuilder element = new StringBuilder();
         final int c = additive.getCoefficient();
         final int power = additive.getExponent();

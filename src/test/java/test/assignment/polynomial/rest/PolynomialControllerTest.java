@@ -54,7 +54,7 @@ class PolynomialControllerTest {
 
     private static final String RAW = "(2*x+7)*(3*x^2-x+1)";
 
-    private static final String SIMPLIFIED = "7-5*x+19*x^2+6*x^3";
+    private static final String SIMPLIFIED = "6*x^3+19*x^2-5*x+7";
 
     private static final String VALUE = "7";
 
@@ -103,12 +103,12 @@ class PolynomialControllerTest {
 
     private static Stream<Arguments> simplificationSource() {
         return Stream.of(
-                Arguments.of("(2*x+7)*(3*x^2-x+1)", "7-5*x+19*x^2+6*x^3"),
-                Arguments.of("4*x^5-3*x^3+2*x-1", "-1+2*x-3*x^3+4*x^5"),
-                Arguments.of("(-3*x^2)*(x^2-x+3)", "-9*x^2+3*x^3-3*x^4"),
-                Arguments.of("(x^2+7*x-1)*(2*x^2-3*x-1)", "1-4*x-24*x^2+11*x^3+2*x^4"),
-                Arguments.of("(3*x+1)^2", "1+6*x+9*x^2"),
-                Arguments.of("(9*x+1)*(3*x-1)", "-1-6*x+27*x^2")
+                Arguments.of("(2*x+7)*(3*x^2-x+1)", "6*x^3+19*x^2-5*x+7"),
+                Arguments.of("4*x^5-3*x^3+2*x-1", "4*x^5-3*x^3+2*x-1"),
+                Arguments.of("(-3*x^2)*(x^2-x+3)", "-3*x^4+3*x^3-9*x^2"),
+                Arguments.of("(x^2+7*x-1)*(2*x^2-3*x-1)", "2*x^4+11*x^3-24*x^2-4*x+1"),
+                Arguments.of("(3*x+1)^2", "9*x^2+6*x+1"),
+                Arguments.of("(9*x+1)*(3*x-1)", "27*x^2-6*x-1")
         );
     }
 

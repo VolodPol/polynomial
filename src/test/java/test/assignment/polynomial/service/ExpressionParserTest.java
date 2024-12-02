@@ -103,7 +103,7 @@ class ExpressionParserTest {
 
     @Test
     void simplifiedToString() {
-        String expected = "7-5*x+19*x^2+6*x^3";
+        String expected = "6*x^3+19*x^2-5*x+7";
 
         var firstAdditive = new Additive(7, 0);
         var secondAdditive = new Additive(-5, 1);
@@ -123,7 +123,7 @@ class ExpressionParserTest {
 
     @Test
     void differentCasesToString() {
-        String expected = "2+4-3+1-1+x-x+2*x-2*x+3*x^2-3*x^2";
+        String expected = "3*x^2-3*x^2+x-x+2*x-2*x+2+4-3+1-1";
 
         var firstAdditive = new Additive(2, 0);
         var secondAdditive = new Additive(4, 0);
