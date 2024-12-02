@@ -62,14 +62,12 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
         double doubleValue = polynomialValidator.validateVariableValue(value);
 
         SimplifiedExpression simplifiedExpression = simplifiedRepository.findSimplifiedExpressionByExpression(simplified);
-        if (simplifiedExpression == null){
+        if (simplifiedExpression == null)
             throw new NotExistingSimplifiedExpressionException("Not existing simplified expression!");
-        }
 
         Evaluation foundEvaluation = evaluationRepository.findBySimplifiedExpression(simplified);
-        if (foundEvaluation != null) {
+        if (foundEvaluation != null)
             return foundEvaluation.getResult();
-        }
 
         Expression expression = parser.parseExpression(simplified);
         double result = evaluateExpression(expression, doubleValue);
