@@ -5,10 +5,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.assertj.core.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,22 +30,13 @@ import test.assignment.polynomial.repository.SimplifiedExpressionRepository;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class PolynomialControllerTest {
-    //TODO: add test cases for these examples
-    /**
-     * Raw                         Simplified
-     * (2*x+7)*(3*x^2-x+1)         7-5*x+19*x^2+6*x^3
-     * 4*x^5-3*x^3+2*x-1           -1+2*x-3*x^3+4*x^5
-     * (-3*x^2)*(x^2-x+3)          -9*x^2+3*x^3-3*x^4
-     * (x^2+7*x-1)*(2*x^2-3*x-1)   1-4*x-24*x^2+11*x^3+2*x^4
-     * (3*x+1)^2                   1+6*x+9*x^2
-     * (9*x+1)*(3*x-1)             -1-6*x+27*x^2
-     */
     @Autowired
     private MockMvc rest;
 
@@ -91,6 +84,32 @@ class PolynomialControllerTest {
         assertThat(rawRepo.count()).isOne();
         assertThat(simplifiedRepo.count()).isOne();
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("simplificationSource")
+    void testConsequentSimplificationCases(String input, String output) {
+        try {
+            rest.perform(post("/api/simplify")
+                            .contentType(MediaType.TEXT_PLAIN_VALUE)
+                            .content(input.getBytes(StandardCharsets.UTF_8)))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                    .andExpect(content().string(output));
+        } catch (Exception _) {
+            Assertions.fail();
+        }
+    }
+
+    private static Stream<Arguments> simplificationSource() {
+        return Stream.of(
+                Arguments.of("(2*x+7)*(3*x^2-x+1)", "7-5*x+19*x^2+6*x^3"),
+                Arguments.of("4*x^5-3*x^3+2*x-1", "-1+2*x-3*x^3+4*x^5"),
+                Arguments.of("(-3*x^2)*(x^2-x+3)", "-9*x^2+3*x^3-3*x^4"),
+                Arguments.of("(x^2+7*x-1)*(2*x^2-3*x-1)", "1-4*x-24*x^2+11*x^3+2*x^4"),
+                Arguments.of("(3*x+1)^2", "1+6*x+9*x^2"),
+                Arguments.of("(9*x+1)*(3*x-1)", "-1-6*x+27*x^2")
+        );
     }
 
     @Test
