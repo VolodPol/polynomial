@@ -1,6 +1,6 @@
 package test.assignment.polynomial.service.validator;
 
-import test.assignment.polynomial.exceptions.EmptyExpressionException;
+import test.assignment.polynomial.exceptions.EmptyValueException;
 import test.assignment.polynomial.exceptions.NotDecimalVariableValueException;
 
 public abstract class BaseValidator implements PolynomialValidator {
@@ -9,7 +9,7 @@ public abstract class BaseValidator implements PolynomialValidator {
     @Override
     public double validateVariableValue(String x) {
         if (x == null || x.isBlank())
-            throw new EmptyExpressionException("Empty variable");
+            throw new EmptyValueException("Empty variable");
 
         try {
             return Double.parseDouble(x);

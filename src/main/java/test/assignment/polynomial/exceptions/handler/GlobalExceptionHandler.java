@@ -5,10 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import test.assignment.polynomial.exceptions.EmptyExpressionException;
-import test.assignment.polynomial.exceptions.MalformedExpressionException;
-import test.assignment.polynomial.exceptions.NotDecimalVariableValueException;
-import test.assignment.polynomial.exceptions.NotExistingSimplifiedExpressionException;
+import test.assignment.polynomial.exceptions.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -17,6 +14,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {
             EmptyExpressionException.class,
+            EmptyValueException.class,
             MalformedExpressionException.class,
             NotDecimalVariableValueException.class,
             NotExistingSimplifiedExpressionException.class

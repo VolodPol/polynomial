@@ -7,6 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.assignment.polynomial.config.ValidationConfiguration;
 import test.assignment.polynomial.exceptions.EmptyExpressionException;
+import test.assignment.polynomial.exceptions.EmptyValueException;
 import test.assignment.polynomial.exceptions.MalformedExpressionException;
 import test.assignment.polynomial.exceptions.NotDecimalVariableValueException;
 import test.assignment.polynomial.service.validator.PolynomialValidator;
@@ -40,7 +41,7 @@ class PolynomialValidatorTest {
 
     @Test
     void invalidDoubleValue() {
-        assertThrows(EmptyExpressionException.class, () -> polynomialValidator.validateVariableValue(""));
+        assertThrows(EmptyValueException.class, () -> polynomialValidator.validateVariableValue(""));
         assertThrows(NotDecimalVariableValueException.class, () -> polynomialValidator.validateVariableValue("a"));
     }
 

@@ -2,7 +2,7 @@ package test.assignment.polynomial.service;
 
 import test.assignment.polynomial.service.domain.Expression;
 
-abstract public class ExpressionSimplifier {
+public abstract class ExpressionSimplifier {
 
     public void simplifyExpression(Expression expression) {
         simplifyMultipliers(expression);

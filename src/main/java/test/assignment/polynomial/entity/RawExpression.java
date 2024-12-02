@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.io.Serializable;
 
 @Entity
 @Table(name = "raw_expression")
@@ -12,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RawExpression implements Serializable {
+public class RawExpression {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
