@@ -9,6 +9,7 @@ import test.assignment.polynomial.service.domain.Expression.Polynomial.Additive;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,6 +17,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class ExpressionParserImpl implements ExpressionParser {
+    private static final String PRODUCT = "*";
+    private static final String PLUS = "+";
+    private static final String MINUS = "-";
+    private static final String X = "x";
+    private static final String POWER_OPERATOR = "^";
+    private static final String EMPTY_STRING = "";
+
     @Override
     public Expression parseExpression(String representation) {
         Expression expression = new Expression();
@@ -54,10 +62,10 @@ public class ExpressionParserImpl implements ExpressionParser {
         int index = 0;
         while(index < units.length) {
             int coefficient = 1, power = 1;
-            if (units[index].equals("-")) {
+            if (units[index].equals(MINUS)) {
                 isMinus = true;
                 index++;
-            } else if (units[index].equals("+")){
+            } else if (units[index].equals(PLUS)){
                 isMinus = false;
                 index++;
             }
@@ -66,12 +74,12 @@ public class ExpressionParserImpl implements ExpressionParser {
                 if (isNumber(units, index)) {
                     coefficient = Integer.parseInt(units[index++]);
 
-                    if (index == units.length || !units[index].equals("*"))
+                    if (index == units.length || !units[index].equals(PRODUCT))
                         power = 0;
                     else
                         index++;
                 }
-                if (units[index].equals("x") && units[++index].equals("^") && isNumber(units, ++index))
+                if (units[index].equals(X) && units[++index].equals(POWER_OPERATOR) && isNumber(units, ++index))
                     power = Integer.parseInt(units[index++]);
             } catch (ArrayIndexOutOfBoundsException _){}
 
@@ -82,7 +90,7 @@ public class ExpressionParserImpl implements ExpressionParser {
     }
 
     private String[] divide(String string) {
-        List<String> split = new ArrayList<>(List.of(string.split("")));
+        List<String> split = new ArrayList<>(List.of(string.split(EMPTY_STRING)));
         int idx = 0;
 
         while (idx < split.size() - 1) {
@@ -122,50 +130,53 @@ public class ExpressionParserImpl implements ExpressionParser {
                     List<Additive> sorted = multiplier.getAdditives().stream()
                             .sorted((o1, o2) -> Integer.compare(o2.getExponent(), o1.getExponent()))
                             .toList();
-                    String first = sorted.isEmpty() ? "" : this.mapAdditive(sorted.getFirst());
+                    String first = sorted.isEmpty() ? EMPTY_STRING : this.additiveToString(sorted.getFirst());
                     return "(%s)".formatted(
                             first.concat(
-                                    sorted.stream()
-                                            .skip(1)
-                                            .map(additive -> {
-                                                String text = this.mapAdditive(additive);
-                                                if (!text.startsWith("+") && !text.startsWith("-"))
-                                                    return "+".concat(text);
-
-                                                return text;
-                                            })
+                                    sorted.stream().skip(1)
+                                            .map(mapAdditive())
                                             .collect(Collectors.joining())
                             )
                     );
                 })
                 .toList();
 
-        String result = String.join("*", multipliers);
+        String result = String.join(PRODUCT, multipliers);
         return multipliers.size() > 1
                 ? result
                 : result.substring(1, result.length() - 1);
     }
 
-    private String mapAdditive(Additive additive) {
+    private Function<Additive, String> mapAdditive() {
+        return additive -> {
+            String text = this.additiveToString(additive);
+            if (!text.startsWith(PLUS) && !text.startsWith(MINUS))
+                return PLUS.concat(text);
+
+            return text;
+        };
+    }
+
+    private String additiveToString(Additive additive) {
         StringBuilder element = new StringBuilder();
         final int c = additive.getCoefficient();
         final int power = additive.getExponent();
         boolean nonZeroPower = power != 0;
 
         if (nonZeroPower) {
-            element.append("x");
+            element.append(X);
             if (power != 1)
-                element.append("^%d".formatted(power));
+                element.append("%s%d".formatted(POWER_OPERATOR, power));
         }
 
         if (!nonZeroPower)
             element.insert(0, c);
         else if (c == 1)
-            element.insert(0, "+");
+            element.insert(0, PLUS);
         else if (c == -1)
-            element.insert(0, "-");
+            element.insert(0, MINUS);
         else
-            element.insert(0, "%d*".formatted(c));
+            element.insert(0, "%d%s".formatted(c, PRODUCT));
         return element.toString();
     }
 }
