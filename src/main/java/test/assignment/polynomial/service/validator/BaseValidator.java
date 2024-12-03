@@ -5,6 +5,8 @@ import test.assignment.polynomial.exceptions.NotDecimalVariableValueException;
 
 public abstract class BaseValidator implements PolynomialValidator {
     protected final char VARIABLE = 'x';
+    protected final char OPENING_BRACKET = '(';
+    protected final char CLOSING_BRACKET = ')';
 
     @Override
     public double validateVariableValue(String x) {

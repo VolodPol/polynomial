@@ -81,8 +81,9 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
         return result;
     }
 
-    //restriction: only 1 multiplier
     private double evaluateExpression(Expression expression, double value) {
+        if (expression.getMultipliers().size() > 1)
+            throw new IllegalArgumentException("The expression must be simplified!");
         return expression.getMultipliers().stream()
                 .flatMap(p -> p.getAdditives().stream())
                 .mapToDouble(a -> a.getCoefficient() * Math.pow(value, a.getExponent()))
