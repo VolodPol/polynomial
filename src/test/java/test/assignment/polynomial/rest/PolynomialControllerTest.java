@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import test.assignment.polynomial.dto.ExpressionDto;
 import test.assignment.polynomial.entity.Evaluation;
 import test.assignment.polynomial.entity.RawExpression;
 import test.assignment.polynomial.entity.SimplifiedExpression;
@@ -28,7 +29,6 @@ import test.assignment.polynomial.repository.EvaluationRepository;
 import test.assignment.polynomial.repository.RawExpressionRepository;
 import test.assignment.polynomial.repository.SimplifiedExpressionRepository;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -52,6 +52,8 @@ class PolynomialControllerTest {
     @Autowired
     private CacheManager manager;
 
+    private final ObjectMapper jsonMapper = new ObjectMapper();
+
     private static final String RAW = "(2*x+7)*(3*x^2-x+1)";
 
     private static final String SIMPLIFIED = "6*x^3+19*x^2-5*x+7";
@@ -72,11 +74,11 @@ class PolynomialControllerTest {
 
         try {
             rest.perform(post("/api/simplify")
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(RAW.getBytes(StandardCharsets.UTF_8)))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(RAW))))
                     .andExpect(status().isCreated())
-                    .andExpect(content().contentType("text/plain;charset=UTF-8"))
-                    .andExpect(content().string(SIMPLIFIED));
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.expression").value(SIMPLIFIED));
         } catch (Exception _) {
             Assertions.fail();
         }
@@ -91,11 +93,11 @@ class PolynomialControllerTest {
     void testConsequentSimplificationCases(String input, String output) {
         try {
             rest.perform(post("/api/simplify")
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(input.getBytes(StandardCharsets.UTF_8)))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(input))))
                     .andExpect(status().isCreated())
-                    .andExpect(content().contentType("text/plain;charset=UTF-8"))
-                    .andExpect(content().string(output));
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.expression").value(output));
         } catch (Exception _) {
             Assertions.fail();
         }
@@ -121,11 +123,11 @@ class PolynomialControllerTest {
 
         try {
             rest.perform(post("/api/simplify")
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(RAW))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(RAW))))
                     .andExpect(status().isCreated())
-                    .andExpect(content().contentType("text/plain;charset=UTF-8"))
-                    .andExpect(content().string(SIMPLIFIED));
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.expression").value(SIMPLIFIED));
         } catch (Exception _) {
             Assertions.fail();
         }
@@ -140,12 +142,12 @@ class PolynomialControllerTest {
 
         String expectedResponse;
         try {
-            expectedResponse = new ObjectMapper().writeValueAsString(
+            expectedResponse = jsonMapper.writeValueAsString(
                     new ErrorResponse(HttpStatus.BAD_REQUEST, "Not existing simplified expression!")
             );
             rest.perform(post("/api/evaluate").param("value", VALUE)
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(SIMPLIFIED))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(SIMPLIFIED))))
                     .andExpect(status().is4xxClientError())
                     .andExpect(content().json(expectedResponse));
 
@@ -164,11 +166,13 @@ class PolynomialControllerTest {
 
         try {
             rest.perform(post("/api/evaluate").param("value", VALUE)
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(SIMPLIFIED))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(SIMPLIFIED))))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().string(String.valueOf(EVALUATED)));
+                    .andExpect(jsonPath("$.expression").value(SIMPLIFIED))
+                    .andExpect(jsonPath("$.x").value(VALUE))
+                    .andExpect(jsonPath("$.result").value(EVALUATED));
         } catch (Exception _) {
             Assertions.fail();
         }
@@ -191,11 +195,13 @@ class PolynomialControllerTest {
 
         try {
             rest.perform(post("/api/evaluate").param("value", VALUE)
-                            .contentType(MediaType.TEXT_PLAIN_VALUE)
-                            .content(SIMPLIFIED))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(new ExpressionDto(SIMPLIFIED))))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(content().string(String.valueOf(EVALUATED)));
+                    .andExpect(jsonPath("$.expression").value(SIMPLIFIED))
+                    .andExpect(jsonPath("$.x").value(VALUE))
+                    .andExpect(jsonPath("$.result").value(EVALUATED));
         } catch (Exception _) {
             Assertions.fail();
         }

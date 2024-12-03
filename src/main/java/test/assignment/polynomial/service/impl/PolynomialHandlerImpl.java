@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import test.assignment.polynomial.dto.ExpressionDto;
 import test.assignment.polynomial.entity.Evaluation;
 import test.assignment.polynomial.entity.RawExpression;
 import test.assignment.polynomial.entity.SimplifiedExpression;
@@ -33,18 +34,19 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     @Override
     @Cacheable("simplified")
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public SimplifiedExpression simplify(String raw) {
-        polynomialValidator.validateExpressionString(raw);
+    public SimplifiedExpression simplify(ExpressionDto raw) {
+        String rawExpression = raw.expression();
+        polynomialValidator.validateExpressionString(rawExpression);
 
-        SimplifiedExpression simplifiedExpression = simplifiedRepository.findByRawExpression(raw);
+        SimplifiedExpression simplifiedExpression = simplifiedRepository.findByRawExpression(rawExpression);
         if (simplifiedExpression != null)
             return simplifiedExpression;
 
-        Expression expression = parser.parseExpression(raw);
+        Expression expression = parser.parseExpression(rawExpression);
         simplifier.simplifyExpression(expression);
         String simplified = parser.expressionToString(expression);
 
-        RawExpression rawEntity = RawExpression.builder().expression(raw).build();
+        RawExpression rawEntity = RawExpression.builder().expression(rawExpression).build();
         SimplifiedExpression simplifiedEntity = new SimplifiedExpression();
         simplifiedEntity.setExpression(simplified);
         simplifiedRepository.save(simplifiedEntity);
@@ -57,19 +59,20 @@ public class PolynomialHandlerImpl implements PolynomialHandler {
     @Override
     @Cacheable("evaluated")
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public double evaluate(String simplified, String value) {
-        polynomialValidator.validateExpressionString(simplified);
+    public double evaluate(ExpressionDto simplified, String value) {
+        String inputExpression = simplified.expression();
+        polynomialValidator.validateExpressionString(inputExpression);
         double doubleValue = polynomialValidator.validateVariableValue(value);
 
-        SimplifiedExpression simplifiedExpression = simplifiedRepository.findSimplifiedExpressionByExpression(simplified);
+        SimplifiedExpression simplifiedExpression = simplifiedRepository.findSimplifiedExpressionByExpression(inputExpression);
         if (simplifiedExpression == null)
             throw new NotExistingSimplifiedExpressionException("Not existing simplified expression!");
 
-        Evaluation foundEvaluation = evaluationRepository.findBySimplifiedExpression(simplified);
+        Evaluation foundEvaluation = evaluationRepository.findBySimplifiedExpression(inputExpression);
         if (foundEvaluation != null)
             return foundEvaluation.getResult();
 
-        Expression expression = parser.parseExpression(simplified);
+        Expression expression = parser.parseExpression(inputExpression);
         double result = evaluateExpression(expression, doubleValue);
         Evaluation newEvaluation = Evaluation.builder()
                 .result(result)
